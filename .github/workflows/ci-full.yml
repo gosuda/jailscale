@@ -1,10 +1,10 @@
 # The two gates that are too expensive to run on every pull request: the thousand-visitor load test
-# and the §14 budget, which needs a native build. They run on every push to main and every night,
+# and the §14 budget, which needs a native build. They run weekly and on manual dispatch,
 # and on a pull request that asks for them with the `ci:full` label.
 #
 # They are in their own file, and not in ci.yml behind a label, because of what a label event does
-# to a required check. `main`'s ruleset requires `test (ubuntu-24.04)`, `test (macos-15)`,
-# `test (windows-2025)` and `analyze`. Adding `labeled` to ci.yml's triggers makes GitHub start a
+# to a required check. `main`'s ruleset requires `test (depot-ubuntu-24.04)`, `test (depot-macos-latest)`,
+# `test (depot-windows-2025-4)` and `analyze`. Adding `labeled` to ci.yml's triggers makes GitHub start a
 # whole ci.yml run for every label -- the type and area ones every pull request carries -- in which
 # those four jobs skip, and a skipped check run for a required context leaves the pull request
 # BLOCKED for good. That was measured on #193, whose every real job was green and which could not
@@ -20,12 +20,10 @@
 name: ci-full
 
 on:
-  push:
-    branches: [main]
   pull_request:
     types: [opened, synchronize, reopened, labeled]
   schedule:
-    - cron: '17 18 * * *'   # with ci.yml's nightly, so drift in the runner images shows up here too
+    - cron: '17 18 * * 0'   # Weekly, alongside the core drift check.
   workflow_dispatch:
     inputs:
       only:
@@ -72,7 +70,7 @@ jobs:
     if: ${{ (github.event_name != 'pull_request'
           || contains(github.event.pull_request.labels.*.name, 'ci:full'))
         && (github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == 'load') }}
-    runs-on: ubuntu-24.04
+    runs-on: depot-ubuntu-24.04-4
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v6
@@ -85,12 +83,12 @@ jobs:
         shell: bash
 
   # The lightweight budget of §14. It needs the native binaries, so it costs a native-image build
-  # and does not belong on every pull request; main and the nightly run are enough to catch a drift.
+  # and does not belong on every pull request; the weekly and requested runs catch drift.
   budget:
     if: ${{ (github.event_name != 'pull_request'
           || contains(github.event.pull_request.labels.*.name, 'ci:full'))
         && (github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == 'budget') }}
-    runs-on: ubuntu-24.04
+    runs-on: depot-ubuntu-24.04-4
     steps:
       - uses: actions/checkout@v7
       # The same toolchain and options the release uses, so the gate measures what ships. A gate on
@@ -142,7 +140,7 @@ jobs:
   # that runs on every push is a measurement nobody reads.
   idle-split:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.only == 'idle-split' }}
-    runs-on: ubuntu-24.04
+    runs-on: depot-ubuntu-24.04-4
     steps:
       - uses: actions/checkout@v7
       # The release toolchain, for the reason the budget job gives above: a decomposition of a
