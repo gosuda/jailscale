@@ -15,10 +15,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: ubuntu-24.04,     target: linux-amd64 }
-          - { os: ubuntu-24.04-arm, target: linux-arm64 }
-          - { os: macos-15,         target: darwin-arm64 }
-          - { os: windows-2025,     target: windows-amd64 }
+          - { os: depot-ubuntu-24.04,     target: linux-amd64 }
+          - { os: depot-ubuntu-24.04-arm, target: linux-arm64 }
+          - { os: depot-macos-latest,         target: darwin-arm64 }
+          - { os: depot-windows-2025-4,     target: windows-amd64 }
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
@@ -124,7 +124,7 @@ jobs:
 
   release:
     needs: native
-    runs-on: ubuntu-24.04
+    runs-on: depot-ubuntu-24.04
     if: startsWith(github.ref, 'refs/tags/')
     # Job-scoped, and contents: write is restated because a job-level block replaces the top-level
     # one rather than adding to it. The other two are what an attestation needs: an OIDC token to
