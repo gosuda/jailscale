@@ -41,9 +41,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: ubuntu-24.04
+          - runner: depot-ubuntu-24.04
             arch: amd64
-          - runner: ubuntu-24.04-arm
+          - runner: depot-ubuntu-24.04-arm
             arch: arm64
     runs-on: ${{ matrix.runner }}
     permissions:
@@ -179,7 +179,7 @@ jobs:
 
   manifest:
     needs: build
-    runs-on: ubuntu-24.04
+    runs-on: depot-ubuntu-24.04
     permissions:
       packages: write
     strategy:
