@@ -1,0 +1,7 @@
+self-hosted-runner:
+  labels:
+    - depot-macos-latest
+    - depot-ubuntu-24.04
+    - depot-ubuntu-24.04-4
+    - depot-ubuntu-24.04-arm
+    - depot-windows-2025-4
