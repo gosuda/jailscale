@@ -26,7 +26,7 @@ env:
 
 jobs:
   signed:
-    runs-on: ubuntu-24.04
+    runs-on: depot-ubuntu-24.04
     permissions:
       contents: write # to read the release and, when it is not signed, to draft it again
     outputs:
@@ -68,7 +68,7 @@ jobs:
   latest:
     needs: signed
     if: needs.signed.outputs.prerelease != 'true'
-    runs-on: ubuntu-24.04
+    runs-on: depot-ubuntu-24.04
     permissions:
       packages: write
       actions: read # to find and wait for the tag push's image build
